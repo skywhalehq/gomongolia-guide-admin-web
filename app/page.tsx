@@ -1,103 +1,107 @@
+'use client';
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { httpGet } from "../helper/httpHelper";
+import { User } from "@/interfaces/users";
 
 export default function Home() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await httpGet<User[]>(
+          "https://api.evseg.store/api/v1/guide/admin/users",
+        );
+        setUsers(data || []);
+      } catch (e: any) {
+        setError(e.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUsers();
+  }, []);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+    <div className="font-sans min-h-screen p-8 pb-20 grid grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 sm:p-20">
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-4xl">
         <Image
-          className="dark:invert"
           src="/next.svg"
           alt="Next.js logo"
           width={180}
           height={38}
           priority
+          className="dark:invert"
         />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        <section className="w-full">
+          <h2 className="text-xl font-semibold mb-6 border-b pb-2">Users List</h2>
+
+          {loading && <p>Loading users...</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
+
+          {!loading && !error && users.length === 0 && <p>No users found.</p>}
+
+          {users.length > 0 && (
+            <div className="space-y-6">
+              {users.map((user) => (
+                <div
+                  key={user.id}
+                  className="border rounded-md p-4 shadow-sm bg-white dark:bg-gray-800"
+                >
+                  <h3 className="text-lg font-semibold mb-1">
+                    {user.name || "N/A"} {user.surname || ""}
+                    {user.type && (
+                      <span className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400">
+                        ({user.type})
+                      </span>
+                    )}
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-y-1 text-sm text-gray-700 dark:text-gray-300">
+                    <div>
+                      <strong>Phone:</strong> {user.phone || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Commission:</strong> {user.commission}
+                    </div>
+                    <div>
+                      <strong>RD:</strong> {user.rd || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Plate Number:</strong> {user.plate_number || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Car Model:</strong> {user.car_model || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Bank:</strong> {user.bank_name || "N/A"} ({user.bank_code || "N/A"})
+                    </div>
+                    <div>
+                      <strong>Bank Account:</strong> {user.bank_account || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Active:</strong> {user.is_active ? "Yes" : "No"}
+                    </div>
+                    <div>
+                      <strong>Onboarded:</strong> {user.is_onboarded ? "Yes" : "No"}
+                    </div>
+                    <div>
+                      <strong>Last Login:</strong> {new Date(user.last_login_at).toLocaleString() || "N/A"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
