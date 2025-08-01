@@ -13,7 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Guide Admin Panel",
+  title: "GoMongolia Guide Admin Panel",
+  description: "Admin dashboard for managing GoMongolia guide operations",
 };
 
 export default function RootLayout({
