@@ -75,8 +75,8 @@ export default function Home() {
       setError(null);
       try {
         const data = await httpGet<User[]>(
-          // "https://api.evseg.store/api/v1/guide/admin/users"
-          "http://192.168.12.128:8081/api/v1/guide/admin/users"
+          "https://api.evseg.store/api/v1/guide/admin/users"
+          // "http://192.168.12.128:8081/api/v1/guide/admin/users"
         );
         setUsers(data || []);
       } catch (e: any) {

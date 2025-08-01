@@ -85,8 +85,8 @@ export default function Trips() {
       setError(null);
       try {
         const response = await httpGet<Trip[]>(
-          //   "https://api.evseg.store/api/v1/guide/admin/trips"
-          "http://192.168.12.128:8081/api/v1/guide/admin/trips"
+            "https://api.evseg.store/api/v1/guide/admin/trips"
+          // "http://192.168.12.128:8081/api/v1/guide/admin/trips"
         );
         setTrips(response || []);
       } catch (e: any) {
